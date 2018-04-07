@@ -1,0 +1,621 @@
+-------------------------------------------------------------------------------------------
+                                Probleme d'ordonnancement
+-------------------------------------------------------------------------------------------
+
+---------------------------------------------------
+                Lecture du fichier
+---------------------------------------------------
+
+Veuillez entrer le nom du fichier .txt a ouvrir (sans extension) : ROSSO-GALIENNE-ELHACHEM-c04
+Nombre de taches : 11
+
+Durees :
+A       3
+B       2
+C       3
+D       5
+E       4
+F       2
+G       2
+H       4
+I       5
+J       1
+K       2
+
+Contraintes :
+A
+B
+C        | B
+D        | A
+E        | D
+F        | E
+G        | D
+H        | E | G
+I        | D
+J        | C | I
+K        | F | H
+
+C ne peut commencer que lorsque la tache B est terminee.
+D ne peut commencer que lorsque la tache A est terminee.
+E ne peut commencer que lorsque la tache D est terminee.
+F ne peut commencer que lorsque la tache E est terminee.
+G ne peut commencer que lorsque la tache D est terminee.
+H ne peut commencer que lorsque la tache E est terminee.
+H ne peut commencer que lorsque la tache G est terminee.
+I ne peut commencer que lorsque la tache D est terminee.
+J ne peut commencer que lorsque la tache C est terminee.
+J ne peut commencer que lorsque la tache I est terminee.
+K ne peut commencer que lorsque la tache F est terminee.
+K ne peut commencer que lorsque la tache H est terminee.
+
+
+---------------------------------------------------
+                Creation du graphe
+---------------------------------------------------
+
+Proprietes du graphe :
+        - nombre de sommets : 13
+
+        --> Ajout des sommets "debut de projet" (a) et "fin de projet" (z)
+        --> Creation de la matrice d'adjacence : adj[x][y] = vrai (s'il existe un arc de x vers y) ou faux.
+        --> Creation de la matrice des valeurs : val[x][y] = valeur de l'arc de x vers y s'il existe.
+        --> Creation des arcs associes aux contraintes de type "x ne peut commencer que lorsque y est terminee"
+                A ----[3]----> D
+                B ----[2]----> C
+                C ----[3]----> J
+                D ----[5]----> E
+                D ----[5]----> G
+                D ----[5]----> I
+                E ----[4]----> F
+                E ----[4]----> H
+                F ----[2]----> K
+                G ----[2]----> H
+                H ----[4]----> K
+                I ----[5]----> J
+        --> Recherche des points d'entree et des points de sortie - Ajout des arcs incidents au debut et a la fin de projet
+                a ----[0]----> A
+                a ----[0]----> B
+                J ----[1]----> z
+                K ----[2]----> z
+
+---------------------------------------------------
+                Graphe d'ordonnancement
+---------------------------------------------------
+
+11 taches
+13 sommets
+
+
+Matrice d'adjacence booleenne :
+
+      a   A   B   C   D   E   F   G   H   I   J   K   z
+  a   0   1   1   0   0   0   0   0   0   0   0   0   0
+  A   0   0   0   0   1   0   0   0   0   0   0   0   0
+  B   0   0   0   1   0   0   0   0   0   0   0   0   0
+  C   0   0   0   0   0   0   0   0   0   0   1   0   0
+  D   0   0   0   0   0   1   0   1   0   1   0   0   0
+  E   0   0   0   0   0   0   1   0   1   0   0   0   0
+  F   0   0   0   0   0   0   0   0   0   0   0   1   0
+  G   0   0   0   0   0   0   0   0   1   0   0   0   0
+  H   0   0   0   0   0   0   0   0   0   0   0   1   0
+  I   0   0   0   0   0   0   0   0   0   0   1   0   0
+  J   0   0   0   0   0   0   0   0   0   0   0   0   1
+  K   0   0   0   0   0   0   0   0   0   0   0   0   1
+  z   0   0   0   0   0   0   0   0   0   0   0   0   0
+
+
+
+Matrice des valeurs :
+
+      a   A   B   C   D   E   F   G   H   I   J   K   z
+  a       0   0
+  A                   3
+  B               2
+  C                                           3
+  D                       5       5       5
+  E                           4       4
+  F                                               2
+  G                                   2
+  H                                               4
+  I                                           5
+  J                                                   1
+  K                                                   2
+  z
+
+
+
+---------------------------------------------------
+                Calcul du rang
+---------------------------------------------------
+
+Matrice d'adjacence booleenne :
+
+      a   A   B   C   D   E   F   G   H   I   J   K   z
+  a   0   1   1   0   0   0   0   0   0   0   0   0   0
+  A   0   0   0   0   1   0   0   0   0   0   0   0   0
+  B   0   0   0   1   0   0   0   0   0   0   0   0   0
+  C   0   0   0   0   0   0   0   0   0   0   1   0   0
+  D   0   0   0   0   0   1   0   1   0   1   0   0   0
+  E   0   0   0   0   0   0   1   0   1   0   0   0   0
+  F   0   0   0   0   0   0   0   0   0   0   0   1   0
+  G   0   0   0   0   0   0   0   0   1   0   0   0   0
+  H   0   0   0   0   0   0   0   0   0   0   0   1   0
+  I   0   0   0   0   0   0   0   0   0   0   1   0   0
+  J   0   0   0   0   0   0   0   0   0   0   0   0   1
+  K   0   0   0   0   0   0   0   0   0   0   0   0   1
+  z   0   0   0   0   0   0   0   0   0   0   0   0   0
+
+Nombre de predecesseurs :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   1   1   1   1   1   1   1   2   1   2   2   2
+
+Rang :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0
+
+
+
+
+Matrice d'adjacence booleenne :
+
+      a   A   B   C   D   E   F   G   H   I   J   K   z
+  a   0   0   0   0   0   0   0   0   0   0   0   0   0
+  A   0   0   0   0   1   0   0   0   0   0   0   0   0
+  B   0   0   0   1   0   0   0   0   0   0   0   0   0
+  C   0   0   0   0   0   0   0   0   0   0   1   0   0
+  D   0   0   0   0   0   1   0   1   0   1   0   0   0
+  E   0   0   0   0   0   0   1   0   1   0   0   0   0
+  F   0   0   0   0   0   0   0   0   0   0   0   1   0
+  G   0   0   0   0   0   0   0   0   1   0   0   0   0
+  H   0   0   0   0   0   0   0   0   0   0   0   1   0
+  I   0   0   0   0   0   0   0   0   0   0   1   0   0
+  J   0   0   0   0   0   0   0   0   0   0   0   0   1
+  K   0   0   0   0   0   0   0   0   0   0   0   0   1
+  z   0   0   0   0   0   0   0   0   0   0   0   0   0
+
+Nombre de predecesseurs :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   0   0   1   1   1   1   1   2   1   2   2   2
+
+Rang :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   1   1
+
+
+
+
+Matrice d'adjacence booleenne :
+
+      a   A   B   C   D   E   F   G   H   I   J   K   z
+  a   0   0   0   0   0   0   0   0   0   0   0   0   0
+  A   0   0   0   0   0   0   0   0   0   0   0   0   0
+  B   0   0   0   0   0   0   0   0   0   0   0   0   0
+  C   0   0   0   0   0   0   0   0   0   0   1   0   0
+  D   0   0   0   0   0   1   0   1   0   1   0   0   0
+  E   0   0   0   0   0   0   1   0   1   0   0   0   0
+  F   0   0   0   0   0   0   0   0   0   0   0   1   0
+  G   0   0   0   0   0   0   0   0   1   0   0   0   0
+  H   0   0   0   0   0   0   0   0   0   0   0   1   0
+  I   0   0   0   0   0   0   0   0   0   0   1   0   0
+  J   0   0   0   0   0   0   0   0   0   0   0   0   1
+  K   0   0   0   0   0   0   0   0   0   0   0   0   1
+  z   0   0   0   0   0   0   0   0   0   0   0   0   0
+
+Nombre de predecesseurs :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   0   0   0   0   1   1   1   2   1   2   2   2
+
+Rang :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   1   1   2   2
+
+
+
+
+Matrice d'adjacence booleenne :
+
+      a   A   B   C   D   E   F   G   H   I   J   K   z
+  a   0   0   0   0   0   0   0   0   0   0   0   0   0
+  A   0   0   0   0   0   0   0   0   0   0   0   0   0
+  B   0   0   0   0   0   0   0   0   0   0   0   0   0
+  C   0   0   0   0   0   0   0   0   0   0   0   0   0
+  D   0   0   0   0   0   0   0   0   0   0   0   0   0
+  E   0   0   0   0   0   0   1   0   1   0   0   0   0
+  F   0   0   0   0   0   0   0   0   0   0   0   1   0
+  G   0   0   0   0   0   0   0   0   1   0   0   0   0
+  H   0   0   0   0   0   0   0   0   0   0   0   1   0
+  I   0   0   0   0   0   0   0   0   0   0   1   0   0
+  J   0   0   0   0   0   0   0   0   0   0   0   0   1
+  K   0   0   0   0   0   0   0   0   0   0   0   0   1
+  z   0   0   0   0   0   0   0   0   0   0   0   0   0
+
+Nombre de predecesseurs :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   0   0   0   0   0   1   0   2   0   1   2   2
+
+Rang :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   1   1   2   2   3       3       3
+
+
+
+
+Matrice d'adjacence booleenne :
+
+      a   A   B   C   D   E   F   G   H   I   J   K   z
+  a   0   0   0   0   0   0   0   0   0   0   0   0   0
+  A   0   0   0   0   0   0   0   0   0   0   0   0   0
+  B   0   0   0   0   0   0   0   0   0   0   0   0   0
+  C   0   0   0   0   0   0   0   0   0   0   0   0   0
+  D   0   0   0   0   0   0   0   0   0   0   0   0   0
+  E   0   0   0   0   0   0   0   0   0   0   0   0   0
+  F   0   0   0   0   0   0   0   0   0   0   0   1   0
+  G   0   0   0   0   0   0   0   0   0   0   0   0   0
+  H   0   0   0   0   0   0   0   0   0   0   0   1   0
+  I   0   0   0   0   0   0   0   0   0   0   0   0   0
+  J   0   0   0   0   0   0   0   0   0   0   0   0   1
+  K   0   0   0   0   0   0   0   0   0   0   0   0   1
+  z   0   0   0   0   0   0   0   0   0   0   0   0   0
+
+Nombre de predecesseurs :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   0   0   0   0   0   0   0   0   0   0   2   2
+
+Rang :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   1   1   2   2   3   4   3   4   3   4
+
+
+
+
+Matrice d'adjacence booleenne :
+
+      a   A   B   C   D   E   F   G   H   I   J   K   z
+  a   0   0   0   0   0   0   0   0   0   0   0   0   0
+  A   0   0   0   0   0   0   0   0   0   0   0   0   0
+  B   0   0   0   0   0   0   0   0   0   0   0   0   0
+  C   0   0   0   0   0   0   0   0   0   0   0   0   0
+  D   0   0   0   0   0   0   0   0   0   0   0   0   0
+  E   0   0   0   0   0   0   0   0   0   0   0   0   0
+  F   0   0   0   0   0   0   0   0   0   0   0   0   0
+  G   0   0   0   0   0   0   0   0   0   0   0   0   0
+  H   0   0   0   0   0   0   0   0   0   0   0   0   0
+  I   0   0   0   0   0   0   0   0   0   0   0   0   0
+  J   0   0   0   0   0   0   0   0   0   0   0   0   0
+  K   0   0   0   0   0   0   0   0   0   0   0   0   1
+  z   0   0   0   0   0   0   0   0   0   0   0   0   0
+
+Nombre de predecesseurs :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   0   0   0   0   0   0   0   0   0   0   0   1
+
+Rang :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   1   1   2   2   3   4   3   4   3   4   5
+
+
+
+
+Matrice d'adjacence booleenne :
+
+      a   A   B   C   D   E   F   G   H   I   J   K   z
+  a   0   0   0   0   0   0   0   0   0   0   0   0   0
+  A   0   0   0   0   0   0   0   0   0   0   0   0   0
+  B   0   0   0   0   0   0   0   0   0   0   0   0   0
+  C   0   0   0   0   0   0   0   0   0   0   0   0   0
+  D   0   0   0   0   0   0   0   0   0   0   0   0   0
+  E   0   0   0   0   0   0   0   0   0   0   0   0   0
+  F   0   0   0   0   0   0   0   0   0   0   0   0   0
+  G   0   0   0   0   0   0   0   0   0   0   0   0   0
+  H   0   0   0   0   0   0   0   0   0   0   0   0   0
+  I   0   0   0   0   0   0   0   0   0   0   0   0   0
+  J   0   0   0   0   0   0   0   0   0   0   0   0   0
+  K   0   0   0   0   0   0   0   0   0   0   0   0   0
+  z   0   0   0   0   0   0   0   0   0   0   0   0   0
+
+Nombre de predecesseurs :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   0   0   0   0   0   0   0   0   0   0   0   0
+
+Rang :
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   1   1   2   2   3   4   3   4   3   4   5   6
+
+
+---------------------------------------------------
+                Calendriers
+---------------------------------------------------
+
+Calendrier au plus tot :
+
+
+Rang : 0
+        a :
+                Date au plus tot : Maximum : 0
+
+
+
+Rang : 1
+        A :
+                D+tot(a) + v(a,A) = 0 + 0 = 0
+                Date au plus tot : Maximum : 0
+
+        B :
+                D+tot(a) + v(a,B) = 0 + 0 = 0
+                Date au plus tot : Maximum : 0
+
+
+
+Rang : 2
+        C :
+                D+tot(B) + v(B,C) = 0 + 2 = 2
+                Date au plus tot : Maximum : 2
+
+        D :
+                D+tot(A) + v(A,D) = 0 + 3 = 3
+                Date au plus tot : Maximum : 3
+
+
+
+Rang : 3
+        E :
+                D+tot(D) + v(D,E) = 3 + 5 = 8
+                Date au plus tot : Maximum : 8
+
+        G :
+                D+tot(D) + v(D,G) = 3 + 5 = 8
+                Date au plus tot : Maximum : 8
+
+        I :
+                D+tot(D) + v(D,I) = 3 + 5 = 8
+                Date au plus tot : Maximum : 8
+
+
+
+Rang : 4
+        F :
+                D+tot(E) + v(E,F) = 8 + 4 = 12
+                Date au plus tot : Maximum : 12
+
+        H :
+                D+tot(E) + v(E,H) = 8 + 4 = 12
+                D+tot(G) + v(G,H) = 8 + 2 = 10
+                Date au plus tot : Maximum : 12
+
+        J :
+                D+tot(C) + v(C,J) = 2 + 3 = 5
+                D+tot(I) + v(I,J) = 8 + 5 = 13
+                Date au plus tot : Maximum : 13
+
+
+
+Rang : 5
+        K :
+                D+tot(F) + v(F,K) = 12 + 2 = 14
+                D+tot(H) + v(H,K) = 12 + 4 = 16
+                Date au plus tot : Maximum : 16
+
+
+
+Rang : 6
+        z :
+                D+tot(z) + v(z,L) = 13 + 1 = 14
+                D+tot(z) + v(z,L) = 16 + 2 = 18
+                Date au plus tot : Maximum : 18
+
+
+
+Calendrier au plus tot :
+
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   0   0   2   3   8  12   8  12   8  13  16  18
+
+
+Calendrier au plus tard :
+
+
+Rang : 6
+        z :
+                Date au plus tard : Minimum : 18
+
+
+
+Rang : 5
+        K :
+                D+tard(z) - v(z,L) = 18 - 2 = 16
+                Date au plus tard : Minimum : 16
+
+
+
+Rang : 4
+        J :
+                D+tard(z) - v(z,L) = 18 - 1 = 17
+                Date au plus tard : Minimum : 17
+
+        H :
+                D+tard(K) - v(H,K) = 16 - 4 = 12
+                Date au plus tard : Minimum : 12
+
+        F :
+                D+tard(K) - v(F,K) = 16 - 2 = 14
+                Date au plus tard : Minimum : 14
+
+
+
+Rang : 3
+        I :
+                D+tard(J) - v(I,J) = 17 - 5 = 12
+                Date au plus tard : Minimum : 12
+
+        G :
+                D+tard(H) - v(G,H) = 12 - 2 = 10
+                Date au plus tard : Minimum : 10
+
+        E :
+                D+tard(F) - v(E,F) = 14 - 4 = 10
+                D+tard(H) - v(E,H) = 12 - 4 = 8
+                Date au plus tard : Minimum : 8
+
+
+
+Rang : 2
+        D :
+                D+tard(E) - v(D,E) = 8 - 5 = 3
+                D+tard(G) - v(D,G) = 10 - 5 = 5
+                D+tard(I) - v(D,I) = 12 - 5 = 7
+                Date au plus tard : Minimum : 3
+
+        C :
+                D+tard(J) - v(C,J) = 17 - 3 = 14
+                Date au plus tard : Minimum : 14
+
+
+
+Rang : 1
+        B :
+                D+tard(C) - v(B,C) = 14 - 2 = 12
+                Date au plus tard : Minimum : 12
+
+        A :
+                D+tard(D) - v(A,D) = 3 - 3 = 0
+                Date au plus tard : Minimum : 0
+
+
+
+Rang : 0
+        a :
+                D+tard(A) - v(a,A) = 0 - 0 = 0
+                D+tard(B) - v(a,B) = 12 - 0 = 12
+                Date au plus tard : Minimum : 0
+
+
+
+Calendrier au plus tard :
+
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   0  12  14   3   8  14  10  12  12  17  16  18
+
+---------------------------------------------------
+                Marges
+---------------------------------------------------
+
+Marge totale :
+
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   0  12  12   0   0   2   2   0   4   4   0   0
+
+
+Marge libre :
+
+a :
+        D+tot(A) - val(a,A) - D+tot(a) = 0 - 0 - 0 = 0
+        D+tot(B) - val(a,B) - D+tot(a) = 0 - 0 - 0 = 0
+        Minimum : 0
+
+
+A :
+        D+tot(D) - val(A,D) - D+tot(A) = 3 - 3 - 0 = 0
+        Minimum : 0
+
+
+B :
+        D+tot(C) - val(B,C) - D+tot(B) = 2 - 2 - 0 = 0
+        Minimum : 0
+
+
+C :
+        D+tot(J) - val(C,J) - D+tot(C) = 13 - 3 - 2 = 8
+        Minimum : 8
+
+
+D :
+        D+tot(E) - val(D,E) - D+tot(D) = 8 - 5 - 3 = 0
+        D+tot(G) - val(D,G) - D+tot(D) = 8 - 5 - 3 = 0
+        D+tot(I) - val(D,I) - D+tot(D) = 8 - 5 - 3 = 0
+        Minimum : 0
+
+
+E :
+        D+tot(F) - val(E,F) - D+tot(E) = 12 - 4 - 8 = 0
+        D+tot(H) - val(E,H) - D+tot(E) = 12 - 4 - 8 = 0
+        Minimum : 0
+
+
+F :
+        D+tot(K) - val(F,K) - D+tot(F) = 16 - 2 - 12 = 2
+        Minimum : 2
+
+
+G :
+        D+tot(H) - val(G,H) - D+tot(G) = 12 - 2 - 8 = 2
+        Minimum : 2
+
+
+H :
+        D+tot(K) - val(H,K) - D+tot(H) = 16 - 4 - 12 = 0
+        Minimum : 0
+
+
+I :
+        D+tot(J) - val(I,J) - D+tot(I) = 13 - 5 - 8 = 0
+        Minimum : 0
+
+
+J :
+        D+tot(z) - val(J,z) - D+tot(J) = 18 - 1 - 13 = 4
+        Minimum : 4
+
+
+K :
+        D+tot(z) - val(K,z) - D+tot(K) = 18 - 2 - 16 = 0
+        Minimum : 0
+
+
+z :
+        Minimum : 0
+
+
+Marge libre :
+
+  a   A   B   C   D   E   F   G   H   I   J   K   z
+  0   0   0   8   0   0   2   2   0   0   4   0   0
+
+---------------------------------------------------
+        Diagrammes de Gantt
+---------------------------------------------------
+
+Diagramme au plus tot :
+
+     0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+ A   | = | = | = |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ B   | = | = |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ C   |   |   | = | = | = |   |   |   |   |   |   |   |   |   |   |   |   |
+ D   |   |   |   | = | = | = | = | = |   |   |   |   |   |   |   |   |   |
+ E   |   |   |   |   |   |   |   |   | = | = | = | = |   |   |   |   |   |
+ F   |   |   |   |   |   |   |   |   |   |   |   |   | = | = |   |   |   |
+ G   |   |   |   |   |   |   |   |   | = | = |   |   |   |   |   |   |   |
+ H   |   |   |   |   |   |   |   |   |   |   |   |   | = | = | = | = |   |
+ I   |   |   |   |   |   |   |   |   | = | = | = | = | = |   |   |   |   |
+ J   |   |   |   |   |   |   |   |   |   |   |   |   |   | = |   |   |   |
+ K   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | = | =
+
+
+
+Diagramme au plus tard :
+
+     0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+ A   | = | = | = |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ B   |   |   |   |   |   |   |   |   |   |   |   |   | = | = |   |   |   |
+ C   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | = | = | = |
+ D   |   |   |   | = | = | = | = | = |   |   |   |   |   |   |   |   |   |
+ E   |   |   |   |   |   |   |   |   | = | = | = | = |   |   |   |   |   |
+ F   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | = | = |   |
+ G   |   |   |   |   |   |   |   |   |   |   | = | = |   |   |   |   |   |
+ H   |   |   |   |   |   |   |   |   |   |   |   |   | = | = | = | = |   |
+ I   |   |   |   |   |   |   |   |   |   |   |   |   | = | = | = | = | = |
+ J   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | =
+ K   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   | = | =
+
+
+
+Voulez-vous recommencer le traitement avec un autre fichier ? O/N :
