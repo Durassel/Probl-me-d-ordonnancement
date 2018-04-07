@@ -1,2 +1,2 @@
-# Tower defense project
-## C / SDL
+# Problème d'ordonnancement
+## C
